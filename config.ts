@@ -1,17 +1,17 @@
 export default {
   ERC721: {
     Name: {
-      mainnet: "PoP NFT",
-      testnet: "PoP NFT",
+      testnet1: "PoP NFT",
+      testnet2: "PoP NFT",
     },
     Symbol: {
-      mainnet: "POP",
-      testnet: "tPOP",
+      testnet1: "POP",
+      testnet2: "tPOP",
     },
     Supply: {
       Total: {
-        mainnet: "100",
-        testnet: "100",
+        testnet1: "100",
+        testnet2: "100",
       },
     },
   },
