@@ -13,11 +13,9 @@ const MainToken = artifacts.require("MainToken");
 
 
 let users = new Array<String>(5);
-const mainNFT = await MainNFT.new("PoP NFT", "POPNFT", { from: owner });
-const mainToken = await MainToken.new("PoP Token", "POPTKN", { from: owner });
+
   
 contract("Main NFT", ([owner, operator, ...users]) => {
-  let mainGame;
   
   let baseURI;
   let tokenURI;
@@ -39,25 +37,41 @@ contract("Main NFT", ([owner, operator, ...users]) => {
 
 
   before(async () => {
-    mainGame = await MainGame.new(mainNFT.contract._address, mainToken.contract._address, { from: owner });
+    const mainNFT = await MainNFT.new("PoP NFT", "POPNFT", { from: owner });
+    const mainToken = await MainToken.new("PoP Token", "POPTKN", { from: owner });
+    const mainGame = await MainGame.new(mainNFT.contract._address, mainToken.contract._address, { from: owner });
   });
 
-  describe("#1 - Normal behavior", async () => {
-    it("Test fucntion #1", async () => {
+  describe("#1 - Test normal NFT functions", async () => {
+    it("Mint", async () => {
     });
 
-    it("Test fucntion #2", async () => {
+    it("Burn", async () => {
     });
 
-    it("Test fucntion #3", async () => {
+    it("TransferFrom", async () => {
+    });
+
+    it("SetBaseUri", async () => {
     });
   });
 
-  describe("#2 - Trades", async () => {
-    it("Test fucntion #1", async () => {
+  describe("#2 - Test normal token functions", async () => {
+    it("Mint", async () => {
     });
 
-    it("Test fucntion #2", async () => {
+    it("Burn", async () => {
+    });
+
+    it("TransferFrom", async () => {
+    });
+  });
+
+  describe("#3 - Test game contract", async () => {
+    it("Playing the game", async () => {
+    });
+
+    it("Making claims", async () => {
     });
   });
 });
