@@ -23,8 +23,8 @@ const config = {
   defaultNetwork: "hardhat",
   networks: {
     hardhat: {},
-    testnet1: bscTestnet,
-    testnet2: sepoliaTestnet,
+    //testnet1: bscTestnet,
+    //testnet2: sepoliaTestnet,
   },
   solidity: {
     version: "0.8.17",

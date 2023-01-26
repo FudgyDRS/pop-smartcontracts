@@ -5,16 +5,24 @@ import { parseEther, formatUnits } from "ethers/lib/utils";
 import { transferableAbortController } from "util";
 //import { time } from "@nomicfoundation/hardhat-network-helpers";
 
-const MainNFT = artifacts.require("TestNFT");
+const MainGame = artifacts.require("MainGame");
+const MainNFT = artifacts.require("MainNFT");
+const MainToken = artifacts.require("MainToken");
+
+
+
 
 let users = new Array<String>(5);
+const mainNFT = await MainNFT.new("PoP NFT", "POPNFT", { from: owner });
+const mainToken = await MainToken.new("PoP Token", "POPTKN", { from: owner });
+  
 contract("Main NFT", ([owner, operator, ...users]) => {
-  let mainNFT;
-  let mockERC721Sale;
+  let mainGame;
+  
   let baseURI;
   let tokenURI;
-  let n = 0;
-  let maxSupply, maxReserveSupply, totalSupply;
+  
+  let maxSupply, totalSupply;
 
   let startTimestamp;
   let maxPerAddress;
@@ -22,17 +30,16 @@ contract("Main NFT", ([owner, operator, ...users]) => {
 
   let beforeBalance, beforeBalanceOwner;
   let changedBalance, changedBalanceOwner;
-  
+
   let _balance;
   let div10 = "10000000000";
   let div18 = "100000000000000000";
   let div10bn = BN(div10);
   let div18bn = BN(div18);
 
-  let beforeStake;
-  let afterStake;
 
   before(async () => {
+    mainGame = await MainGame.new(mainNFT.contract._address, mainToken.contract._address, { from: owner });
   });
 
   describe("#1 - Normal behavior", async () => {
