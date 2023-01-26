@@ -7,7 +7,7 @@ const main = async () => {
 
   // Check if the network is supported.
 
-  if (networkName === "testnet1" || networkName === "testnet2") {
+  if (networkName === "bscTestnet" || networkName === "sepoliaTestnet") {
     console.log(`Deploying to ${networkName} network...`);
 
 
@@ -32,9 +32,9 @@ const main = async () => {
 
     // Wait for the contracts to be deployed
     await mainNFT.deployed();
-    console.log(`TestNFT to ${mainNFT.address}`);
+    console.log(`MainNFT to ${mainNFT.address}`);
     await mainToken.deployed();
-    console.log(`TestNFT to ${mainToken.address}`);
+    console.log(`MainToken to ${mainToken.address}`);
 
     const mainGame = await MainGame.deploy(
       mainNFT.address,
@@ -42,7 +42,7 @@ const main = async () => {
     );
 
     await mainGame.deployed();
-    console.log(`TestNFT to ${mainGame.address}`);
+    console.log(`MainGame to ${mainGame.address}`);
 
     // Set baseURI
     let tx = await mainNFT.setBaseURI("ipfs://Qmewtrq4SELrrmN1SAQV1y7WFcafGxhCdTdA2wZCEjRmre/");

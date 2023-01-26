@@ -2,29 +2,43 @@ import type { HardhatUserConfig, NetworkUserConfig } from "hardhat/types";
 import "@nomiclabs/hardhat-ethers";
 import "@nomiclabs/hardhat-web3";
 import "@nomiclabs/hardhat-truffle5";
+import "@nomiclabs/hardhat-etherscan";
 import "hardhat-abi-exporter";
 import "hardhat-contract-sizer";
 import "solidity-coverage";
 import "dotenv/config";
 
-const bscTestnet: NetworkUserConfig = {
-  url: "https://data-seed-prebsc-1-s1.binance.org:8545/",
+/* const bscTestnet: NetworkUserConfig = {
+  url: "https://data-seed-prebsc-1-s3.binance.org:8545/",
   chainId: 97,
   accounts: [process.env.KEY_TESTNET!],
 };
 
 const sepoliaTestnet: NetworkUserConfig = {
-  url: "https://data-seed-prebsc-1-s1.binance.org:8545/",
+  url: "https://sepolia.infura.io/v3/",
   chainId: 11155111,
   accounts: [process.env.KEY_TESTNET!],
-};
+}; */
 
 const config = {
   defaultNetwork: "hardhat",
+  etherscan: {
+    apiKey: {
+      sepolia: '4MBCRQ5QXC12U81F8DG12HWQXCINEEM5D2'
+    }
+  },
   networks: {
     hardhat: {},
-    //testnet1: bscTestnet,
-    //testnet2: sepoliaTestnet,
+    bscTestnet: {
+      url: "https://data-seed-prebsc-1-s3.binance.org:8545/",
+      chainId: 97,
+      accounts: [process.env.KEY_TESTNET],
+    },
+    sepoliaTestnet: {
+      url: "https://sepolia.infura.io/v3/52ee363135d344bc9fa2d78067487fc0",
+      chainId: 11155111,
+      accounts: [process.env.KEY_TESTNET],
+    },
   },
   solidity: {
     version: "0.8.17",

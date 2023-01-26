@@ -1,28 +1,28 @@
 export default {
   ERC721: {
     Name: {
-      testnet1: "PoP NFT",
-      testnet2: "PoP NFT",
+      bscTestnet: "PoP NFT",
+      sepoliaTestnet: "PoP NFT",
     },
     Symbol: {
-      testnet1: "POPNFT",
-      testnet2: "POPNFT",
+      bscTestnet: "POPNFT",
+      sepoliaTestnet: "POPNFT",
     },
     Supply: {
       Total: {
-        testnet1: "3000",
-        testnet2: "3000",
+        bscTestnet: "3000",
+        sepoliaTestnet: "3000",
       },
     },
   },
   ERC20: {
     Name: {
-      testnet1: "PoP Token",
-      testnet2: "PoP Token",
+      bscTestnet: "PoP Token",
+      sepoliaTestnet: "PoP Token",
     },
     Symbol: {
-      testnet1: "POPTKN",
-      testnet2: "POPTKN",
+      bscTestnet: "POPTKN",
+      sepoliaTestnet: "POPTKN",
     },
   },
 };

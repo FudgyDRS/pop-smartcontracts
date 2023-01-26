@@ -22,6 +22,7 @@
     "compile": "npx hardhat compile",
     "deploy:testnet1": "npx hardhat run --network sepoliaTestnet scripts/deploy.ts",
     "deploy:testnet2": "npx hardhat run --network bnbTestnet scripts/deploy.ts",
+    "verify:sepoliaTestnet": "npx hardhat verify '0x77eFB7ed59Ca1e35dacA17bAaC473A70fb6E8e54' --network sepoliaTestnet",
     "test": "npx hardhat test",
     "test:coverage": "npx hardhat coverage",
     "test:size-contracts": "npx hardhat size-contracts"
@@ -31,6 +32,7 @@
     "@commitlint/cli": "^17.4.2",
     "@commitlint/config-conventional": "^17.4.2",
     "@nomiclabs/hardhat-ethers": "^2.2.2",
+    "@nomiclabs/hardhat-etherscan": "^3.1.5",
     "@nomiclabs/hardhat-truffle5": "^2.0.7",
     "@nomiclabs/hardhat-web3": "^2.0.0",
     "@nomicfoundation/hardhat-network-helpers": "^1.0.7",
