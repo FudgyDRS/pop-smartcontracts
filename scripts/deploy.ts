@@ -49,6 +49,21 @@ const main = async () => {
     await tx.wait();
     console.log(`Base URI for PoP NFT set to "ipfs://Qmewtrq4SELrrmN1SAQV1y7WFcafGxhCdTdA2wZCEjRmre/"`);
 
+
+    console.log(`Verifying contract on Blockexploer...`);
+
+    await run(`verify:verify`, {
+      address: mainNFT.address,
+      constructorArguments: [config.ERC721.Name[networkName], config.ERC721.Symbol[networkName]],
+    });
+    await run(`verify:verify`, {
+      address: mainToken.address,
+      constructorArguments: [config.ERC20.Name[networkName], config.ERC20.Symbol[networkName]],
+    });
+    await run(`verify:verify`, {
+      address: mainGame.address,
+      constructorArguments: [mainNFT.address, mainToken.address],
+    });
   } else {
     console.log(`Deploying to ${networkName} network is not supported...`);
   }
