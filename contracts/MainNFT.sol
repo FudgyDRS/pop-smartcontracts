@@ -43,7 +43,7 @@ contract MainNFT is ERC721Enumerable, Ownable,TokenTransferrer {
       string memory _name,
       string memory _symbol
   ) ERC721(_name, _symbol) {
-      _maxSupply = 3000;
+      _maxSupply = 500;
   }
 
   /**

@@ -5,14 +5,24 @@ export default {
       testnet2: "PoP NFT",
     },
     Symbol: {
-      testnet1: "POP",
-      testnet2: "tPOP",
+      testnet1: "POPNFT",
+      testnet2: "POPNFT",
     },
     Supply: {
       Total: {
-        testnet1: "100",
-        testnet2: "100",
+        testnet1: "3000",
+        testnet2: "3000",
       },
+    },
+  },
+  ERC20: {
+    Name: {
+      testnet1: "PoP Token",
+      testnet2: "PoP Token",
+    },
+    Symbol: {
+      testnet1: "POPTKN",
+      testnet2: "POPTKN",
     },
   },
 };

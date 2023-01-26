@@ -16,32 +16,38 @@ const main = async () => {
     console.log("Compiled contracts...");
 
     // Deploy contracts.
-    const TestNFT = await ethers.getContractFactory("TestNFT");
-    const testNFT = await TestNFT.deploy(
+    const MainNFT = await ethers.getContractFactory("MainNFT");
+    const MainToken = await ethers.getContractFactory("MainToken");
+    const MainGame = await ethers.getContractFactory("MainGame");
+    
+    const mainNFT = await MainNFT.deploy(
       config.ERC721.Name[networkName],
-      config.ERC721.Symbol[networkName],
-      config.ERC721.Supply.Total[networkName]
+      config.ERC721.Symbol[networkName]
     );
 
-    // Wait for the contract to be deployed
-    await testNFT.deployed();
-    console.log(`TestNFT to ${testNFT.address}`);
-
-    const NFTSale = await ethers.getContractFactory("NFTSale");
-
-    const nftSale = await NFTSale.deploy(
-      testNFT.address,
-      config.ERC721.Supply.Reserve[networkName]
+    const mainToken = await MainToken.deploy(
+      config.ERC20.Name[networkName],
+      config.ERC20.Symbol[networkName]
     );
 
-    // Wait for the contract to be deployed
-    await nftSale.deployed();
-    console.log(`NFTSale to ${nftSale.address}`);
+    // Wait for the contracts to be deployed
+    await mainNFT.deployed();
+    console.log(`TestNFT to ${mainNFT.address}`);
+    await mainToken.deployed();
+    console.log(`TestNFT to ${mainToken.address}`);
 
-    // Transfer ownership of TestNFT to NFTSale contract
-    let tx = await testNFT.transferOwnership(nftSale.address);
+    const mainGame = await MainGame.deploy(
+      mainNFT.address,
+      mainToken.address
+    );
+
+    await mainGame.deployed();
+    console.log(`TestNFT to ${mainGame.address}`);
+
+    // Set baseURI
+    let tx = await mainNFT.setBaseURI("ipfs://Qmewtrq4SELrrmN1SAQV1y7WFcafGxhCdTdA2wZCEjRmre/");
     await tx.wait();
-    console.log(`Ownership of TestNFT transferred to ${nftSale.address}`);
+    console.log(`Base URI for PoP NFT set to "ipfs://Qmewtrq4SELrrmN1SAQV1y7WFcafGxhCdTdA2wZCEjRmre/"`);
 
   } else {
     console.log(`Deploying to ${networkName} network is not supported...`);
