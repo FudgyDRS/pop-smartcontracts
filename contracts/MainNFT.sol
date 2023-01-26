@@ -15,41 +15,35 @@ import "./lib/TokenTransferrer.sol";
  * @title PoP NFT
  * @notice PoP Exercise Contract
  */
-contract MainNFT is ERC721Enumerable, Ownable/* , TokenTransferrer */ {
+contract MainNFT is ERC721Enumerable, Ownable,TokenTransferrer {
   using SafeERC20 for IERC20;
   using Strings for uint256;
 
   bool public isLocked;
   string public baseURI;
+  uint256 public _maxSupply;
 
   event Lock();
   event NonFungibleTokenRecovery(address indexed token, uint256 tokenId);
   event TokenRecovery(address indexed token, uint256 amount);
   event WithdrawERC20(address token, address to, uint256 amount);
 
-  error InsufficentLiquidity();
   error ContractLocked();
-  error BadMaxSupply(uint256 input);
   error MaxSupplyReached();
   error TokenIndexDoesNotExist(uint256 tokenId);
   error NotOwnerOrApproved();
   error InputAlreadySet();
-  error OncePerDay(uint256 last, uint256 current);
 
   /**
     * @notice Constructor
     * @param _name: NFT name
     * @param _symbol: NFT symbol
-    * @param _maxSupply: NFT max totalSupply
     */
   constructor(
       string memory _name,
-      string memory _symbol,
-      uint256 _maxSupply
+      string memory _symbol
   ) ERC721(_name, _symbol) {
-      if((_maxSupply != 100) && (_maxSupply != 2500) && (_maxSupply != 10000)) revert BadMaxSupply(_maxSupply);
-      maxSupply = _maxSupply;
-      payoutPeriod = 31536000;
+      _maxSupply = 3000;
   }
 
   /**
@@ -70,7 +64,7 @@ contract MainNFT is ERC721Enumerable, Ownable/* , TokenTransferrer */ {
     * @dev Callable by owner
     */
   function mint(address _to, uint256 _tokenId) external onlyOwner {
-      if(totalSupply() >= maxSupply) revert MaxSupplyReached();
+      if(totalSupply() >= _maxSupply) revert MaxSupplyReached();
       _mint(_to, _tokenId);
   }
 
@@ -125,9 +119,7 @@ contract MainNFT is ERC721Enumerable, Ownable/* , TokenTransferrer */ {
   ) public virtual override(ERC721, IERC721) {
     //solhint-disable-next-line max-line-length
     if(!_isApprovedOrOwner(_msgSender(), tokenId)) revert NotOwnerOrApproved();
-    endStake(tokenId);
     _transfer(from, to, tokenId);
-    createStake(to, tokenId);
   }
 
 
@@ -136,42 +128,24 @@ contract MainNFT is ERC721Enumerable, Ownable/* , TokenTransferrer */ {
     */
   receive() external payable { }
 
-  /**
-    * @notice Claim tokens using optimized library
-    * @param token: target contract tokens
-    * @param from:
-    * @param to:
-    * @param amount: number of tokens to transfer from target contract
-    */
-  function withdrawERC20(address token, address from, address to, uint256 amount) public onlyOwner {
-    _performERC20Transfer(token, from, to, amount);
+  error WithdrawCouldNotBeProcessed();
+
+  function withdraw() public {
+    (bool success,) = owner().call{value: address(this).balance}("");
+    if (!success) revert WithdrawCouldNotBeProcessed();
   }
 
-  /**
-    * @notice Allows the owner to recover tokens sent to the contract by mistake
-    * @param _token: token address
-    * @dev Callable by owner
-    */
-  /*   function recoverToken(address _token) external onlyOwner {
-    uint256 balance = IERC20(_token).balanceOf(address(this));
-    require(balance != 0, "Operations: Cannot recover zero balance");
+  function ERC20Transfer(address token_, uint256 amount_) public {
+    _performERC20Transfer(token_, address(this), owner(), amount_);
+  }
 
-    IERC20(_token).safeTransfer(address(msg.sender), balance);
+  function ERC721Transfer(address token_, uint256 tokenId_) public {
+    _performERC721Transfer(token_, address(this), owner(), tokenId_);
+  }
 
-    emit TokenRecovery(_token, balance);
-  } */
-
-  /**
-    * @notice Allows the owner to recover non-fungible tokens sent to the contract by mistake
-    * @param _token: NFT token address
-    * @param _tokenId: tokenId
-    * @dev Callable by owner
-    */
-  /* function recoverNonFungibleToken(address _token, uint256 _tokenId) external onlyOwner {
-      IERC721(_token).transferFrom(address(this), address(msg.sender), _tokenId);
-
-      emit NonFungibleTokenRecovery(_token, _tokenId);
-  } */
+  function ERC1155Transfer(address token_, uint256 tokenId_, uint256 amount_) public {
+    _performERC1155Transfer(token_, address(this), owner(), tokenId_, amount_);
+  }
 }
 
 
