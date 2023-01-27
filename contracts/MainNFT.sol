@@ -8,6 +8,7 @@ import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol
 import {ERC721} from "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import {IERC721} from "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import {ERC721Enumerable} from "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
+import {ERC721Burnable} from "@openzeppelin/contracts/token/ERC721/extensions/ERC721Burnable.sol";
 import {Strings} from "@openzeppelin/contracts/utils/Strings.sol";
 import "./lib/TokenTransferrer.sol";
 
@@ -15,7 +16,7 @@ import "./lib/TokenTransferrer.sol";
  * @title PoP NFT
  * @notice PoP Exercise Contract
  */
-contract MainNFT is ERC721Enumerable, Ownable,TokenTransferrer {
+contract MainNFT is ERC721Enumerable, Ownable, ERC721Burnable, TokenTransferrer {
   using SafeERC20 for IERC20;
   using Strings for uint256;
 
@@ -66,6 +67,14 @@ contract MainNFT is ERC721Enumerable, Ownable,TokenTransferrer {
   function mint(address _to, uint256 _tokenId) external onlyOwner {
       if(totalSupply() >= _maxSupply) revert MaxSupplyReached();
       _mint(_to, _tokenId);
+  }
+
+  /**
+    * @notice Allows the user to mint a token to self
+    */
+  function mint() external onlyOwner {
+      if(totalSupply() >= _maxSupply) revert MaxSupplyReached();
+      _mint(msg.sender, totalSupply());
   }
 
   /**
@@ -122,6 +131,14 @@ contract MainNFT is ERC721Enumerable, Ownable,TokenTransferrer {
     _transfer(from, to, tokenId);
   }
 
+  function _beforeTokenTransfer(address from, address to, uint256 firstTokenId, uint256 batchSize) internal virtual override(ERC721, ERC721Enumerable) {
+    super._beforeTokenTransfer(from, to, firstTokenId, batchSize);
+  }
+
+  function supportsInterface(bytes4 interfaceId) public view virtual override(ERC721, ERC721Enumerable) returns (bool) {
+        return
+            super.supportsInterface(interfaceId);
+    }
 
   /**
     * @notice fallback only to recieve payments

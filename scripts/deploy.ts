@@ -49,6 +49,10 @@ const main = async () => {
     await tx.wait();
     console.log(`Base URI for PoP NFT set to "ipfs://Qmewtrq4SELrrmN1SAQV1y7WFcafGxhCdTdA2wZCEjRmre/"`);
 
+    // Grant game contract minter role
+    tx = await mainToken.grantMint(mainGame.address);
+    await tx.wait();
+    console.log(`Game contract granted mint privileges`);
 
     console.log(`Verifying contract on Blockexploer...`);
 
