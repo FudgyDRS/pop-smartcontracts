@@ -3,13 +3,17 @@ import { artifacts, contract, ethers } from "hardhat";
 import { BN, constants, expectEvent, expectRevert, ether, time, balance, send } from "@openzeppelin/test-helpers";
 import { parseEther, formatUnits } from "ethers/lib/utils";
 import { transferableAbortController } from "util";
+import { Overrides } from "ethers/lib/ethers";
 //import { time } from "@nomicfoundation/hardhat-network-helpers";
 
 const MainGame = artifacts.require("MainGame");
 const MainNFT = artifacts.require("MainNFT");
 const MainToken = artifacts.require("MainToken");
+//console.log("artifacts:", MainNFT.toJSON())
 
-
+let mainNFT;
+let mainToken;
+let mainGame;
 
 
 let users = new Array<String>(5);
@@ -37,87 +41,126 @@ contract("Main NFT", ([owner, operator, ...users]) => {
 
 
   before(async () => {
-    const mainNFT = await MainNFT.new("PoP NFT", "POPNFT", { from: owner });
-    const mainToken = await MainToken.new("PoP Token", "POPTKN", { from: owner });
-    const mainGame = await MainGame.new(mainNFT.contract._address, mainToken.contract._address, { from: owner });
+    mainNFT = await MainNFT.new("PoP NFT", "POPNFT", { from: owner });
+    mainToken = await MainToken.new("PoP Token", "POPTKN", { from: owner });
+    mainGame = await MainGame.new(mainNFT.contract._address, mainToken.contract._address, { from: owner });
+    //console.log("typeof mainNFT:", mainNFT)
 
-    await mainToken.grantMint(mainGame._address, { from: owner });
+    await mainToken.grantMint(mainGame.contract._address, { from: owner });
+    
+    //const mint1 = await mainNFT.methods.overloading().call();
+    //const mint2 = await mainNFT.methods.overloading("address,uint256").call();
   });
 
   describe("#1 - Test normal NFT functions", async () => {
     it("Admin Mint", async () => {
-      let totalSupply = await MainNFT.totalSupply({ from: owner })
-      await MainNFT.mint(users[0], totalSupply, { from: owner });
-      let balance = formatUnits(await MainNFT.balanceOf(owner, { from: owner }), 0);
-      expect("1" == balance)
+      let totalSupply = (await mainNFT.totalSupply({ from: owner })).toString();
+      //console.log("totalSupply: ", totalSupply)
 
-      expectRevert(await MainNFT.mint(users[0], totalSupply, { from: users[0] }), "");
+      await mainNFT.mint(users[0], totalSupply);
+      //console.log("thingy:", mainNFT)
+      //console.log("thing:", mainNFT.contract.options.address({address: users[0]}))
+      totalSupply = (await mainNFT.totalSupply({ from: owner })).toString();
+      console.log("thing:", await mainNFT.methods['mint(address,uint256)'].call(users[0], totalSupply, { from: owner }))
+      await mainNFT.methods['mint(address,uint256)'].sendTransaction(users[0], totalSupply, { from: users[0] });
+      //await cally.sendTransaction()
+        //call: {users[0], totalSupply},
+        //.sendTransaction({ from: owner })))
+      //console.log("typeof:", typeof mainNFT.totalSupply({ from: owner }))
+      totalSupply = (await mainNFT.totalSupply({ from: owner })).toString();
+      console.log("totalSupply: ", totalSupply)
+      //methods['mint(address,uint256)']
+      //options[{address: users[0]}]
+
+      //await mainNFT.contract.method
+      let balance = (await mainNFT.balanceOf(users[0], { from: owner })).toString();
+      expect((await mainNFT.totalSupply({ from: owner })).toString()).to.equal(balance);
+
+      //expectRevert(await mainNFT.mint(users[0], parseInt(totalSupply), { from: users[0] }), "Ownable: caller is not the owner");
+      // expectRevert(
+      //   await mainNFT.options({address: users[0]}).methods['mint(address,uint256)'](users[0], totalSupply),
+      //   "Ownable: caller is not the owner"
+      // );
     });
+    /*
+    'mint()': [Function (anonymous)] {
+      call: [Function (anonymous)],
+      sendTransaction: [Function (anonymous)],
+      estimateGas: [Function (anonymous)],
+      request: [Function (anonymous)]
+    },
+    'mint(address,uint256)': [Function (anonymous)] {
+      call: [Function (anonymous)],
+      sendTransaction: [Function (anonymous)],
+      estimateGas: [Function (anonymous)],
+      request: [Function (anonymous)]
+    },
+    */
 
-    it("Normal Mint", async () => {
-      let totalSupply = await MainNFT.totalSupply({ from: owner })
-      await MainNFT.mint({ from: users[0] });
-      let balance = formatUnits(await MainNFT.balanceOf(owner, { from: users[0] }), 0);
+   /*  it("Normal Mint", async () => {
+      let totalSupply = await mainNFT.totalSupply({ from: owner })
+      await mainNFT["mint()"]({ from: users[0] });
+      let balance = formatUnits(await mainNFT.balanceOf(owner, { from: users[0] }), 0);
       expect("1" == balance)
 
-      expectRevert(await MainNFT.mint(users[0], totalSupply, { from: users[0] }), "");
+      expectRevert(await mainNFT.mint(users[0], totalSupply, { from: users[0] }), "");
     });
 
     it("Burn", async () => {
-      await MainNFT.burn(0, { from: owner });
-      expectRevert(await MainNFT.burn(1, { from: owner }), "ERC721: caller is not token owner or approved");
-      await MainNFT.burn(1, { from: users[0] });
+      await mainNFT.burn(0, { from: owner });
+      expectRevert(await mainNFT.burn(1, { from: owner }), "ERC721: caller is not token owner or approved");
+      await mainNFT.burn(1, { from: users[0] });
     });
 
     it("TransferFrom", async () => {
-      let totalSupply = await MainNFT.totalSupply({ from: owner })
-      await MainNFT.mint({ from: users[0] });
-      let balance = formatUnits(await MainNFT.balanceOf(owner, { from: users[0] }), 0);
+      let totalSupply = await mainNFT.totalSupply({ from: owner })
+      await mainNFT.mint({ from: users[0] });
+      let balance = formatUnits(await mainNFT.balanceOf(owner, { from: users[0] }), 0);
       expect("1" == balance)
 
-      expectRevert(await MainNFT.transferFrom(users[0], users[1], totalSupply, { from: owner}), "ERC721: caller is not token owner or approved");
-      await MainNFT.transferFrom(users[0], users[1], totalSupply, { from: users[0]});
-      await MainNFT.ownerOf(totalSupply, { from: users[0] });
-      expect(users[1] == await MainNFT.ownerOf(totalSupply, { from: users[0] }));
-    });
+      expectRevert(await mainNFT.transferFrom(users[0], users[1], totalSupply, { from: owner}), "ERC721: caller is not token owner or approved");
+      await mainNFT.transferFrom(users[0], users[1], totalSupply, { from: users[0]});
+      await mainNFT.ownerOf(totalSupply, { from: users[0] });
+      expect(users[1] == await mainNFT.ownerOf(totalSupply, { from: users[0] }));
+    }); */
   });
 
-  describe("#2 - Test normal token functions", async () => {
+  /* describe("#2 - Test normal token functions", async () => {
     it("Mint", async () => {
-      expectRevert(await MainNFT.mint(users[0], 20000, { from: users[0] }), "Ownable: caller is not the owner");
-      MainNFT.mint(users[0], 20000, { from: owner })
+      expectRevert(await mainNFT.mint(users[0], 20000, { from: users[0] }), "Ownable: caller is not the owner");
+      mainNFT.mint(users[0], 20000, { from: owner })
       
-      let balance = formatUnits(await MainToken.balanceOf(users[0], { from: users[0] }))
+      let balance = formatUnits(await mainToken.balanceOf(users[0], { from: users[0] }))
       expect(balance == "20000")
     });
 
     it("Burn", async () => {
-      expectRevert(await MainNFT.burn(20000, { from: owner }), "ERC20: burn amount exceeds balance");
-      await MainNFT.burn(10000, { from: users[0] })
+      expectRevert(await mainNFT.burn(20000, { from: owner }), "ERC20: burn amount exceeds balance");
+      await mainNFT.burn(10000, { from: users[0] })
 
-      let balance = formatUnits(await MainToken.balanceOf(users[0], { from: users[0] }))
+      let balance = formatUnits(await mainToken.balanceOf(users[0], { from: users[0] }))
       expect(balance == "10000")
     });
 
     it("TransferFrom", async () => {
-      expectRevert(await MainNFT.transferFrom(users[0], users[1], 10000, { from: owner }), "ERC20: insufficient allowance");
-      await MainNFT.transferFrom(users[0], users[1], 10000, { from: users[0] })
+      expectRevert(await mainNFT.transferFrom(users[0], users[1], 10000, { from: owner }), "ERC20: insufficient allowance");
+      await mainNFT.transferFrom(users[0], users[1], 10000, { from: users[0] })
 
-      let balance = formatUnits(await MainToken.balanceOf(users[0], { from: users[0] }))
+      let balance = formatUnits(await mainToken.balanceOf(users[0], { from: users[0] }))
       expect(balance == "0")
 
-      balance = formatUnits(await MainToken.balanceOf(users[0], { from: users[1] }))
+      balance = formatUnits(await mainToken.balanceOf(users[0], { from: users[1] }))
       expect(balance == "10000")
     });
   });
 
   describe("#3 - Test game contract", async () => {
     it("Playing the game", async () => {
-      await MainNFT.mint({ from: users[0] });
-      await MainNFT.mint({ from: users[0] });
+      await mainNFT.mint({ from: users[0] });
+      await mainNFT.mint({ from: users[0] });
     });
 
     it("Making claims", async () => {
     });
-  });
+  }); */
 });

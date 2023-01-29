@@ -72,10 +72,14 @@ contract MainNFT is ERC721Enumerable, Ownable, ERC721Burnable, TokenTransferrer 
   /**
     * @notice Allows the user to mint a token to self
     */
-  function mint() external onlyOwner {
+  function mint() external {
       if(totalSupply() >= _maxSupply) revert MaxSupplyReached();
       _mint(msg.sender, totalSupply());
   }
+
+  /* function totalSupply() public virtual override returns(uint256) {
+    return totalSupply();
+  } */
 
   /**
     * @notice Allows the owner to set the base URI to be used for all token IDs
