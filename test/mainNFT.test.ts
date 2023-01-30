@@ -1,7 +1,7 @@
 import { assert, expect } from "chai";
 import { artifacts, contract, ethers } from "hardhat";
 import { BN, constants, expectEvent, expectRevert, ether, time, balance, send } from "@openzeppelin/test-helpers";
-import { parseEther, formatUnits } from "ethers/lib/utils";
+import { parseEther, formatUnits, parseUnits } from "ethers/lib/utils";
 import { transferableAbortController } from "util";
 import { Overrides } from "ethers/lib/ethers";
 //import { time } from "@nomicfoundation/hardhat-network-helpers";
@@ -15,10 +15,6 @@ let mainNFT;
 let mainToken;
 let mainGame;
 
-
-let users = new Array<String>(5);
-
-  
 contract("Main NFT", ([owner, operator, ...users]) => {
   
   let baseURI;
@@ -50,6 +46,8 @@ contract("Main NFT", ([owner, operator, ...users]) => {
 
   describe("#1 - Test normal NFT functions", async () => {
     it("Admin Mint", async () => {
+
+      /* Mint to users[0] */
       let totalSupply = (await mainNFT.totalSupply({ from: owner })).toString();
       //console.log("totalSupply: ", totalSupply)
 
@@ -59,9 +57,19 @@ contract("Main NFT", ([owner, operator, ...users]) => {
 
       let balance = (await mainNFT.balanceOf(users[0], { from: owner })).toString();
       expect((await mainNFT.totalSupply({ from: owner })).toString()).to.equal(balance);
+      //console.log("totalSupply: ", totalSupply)
 
       await expectRevert(mainNFT.methods['mint(address,uint256)']
         .sendTransaction(users[0], totalSupply, { from: users[0] }), 'Ownable: caller is not the owner');
+
+      /* Mint to owner*/
+      await mainNFT.mint(owner, totalSupply);
+      totalSupply = (await mainNFT.totalSupply({ from: owner })).toString();
+
+      console.log("parseUnits", parseUnits("3.14159", 7))
+      // result:
+      // parseUnits BigNumber { _hex: '0x01df5e5c', _isBigNumber: true }
+      // 0x01df5e5c === 31415900
     });
 
     it("Normal Mint", async () => {
@@ -73,8 +81,8 @@ contract("Main NFT", ([owner, operator, ...users]) => {
     });
 
     /* it("Burn", async () => {
-      await mainNFT.burn(0, { from: owner });
-      expectRevert(await mainNFT.burn(1, { from: owner }), "ERC721: caller is not token owner or approved");
+      await mainNFT.burn(1, { from: owner });
+      await expectRevert(mainNFT.burn(1, { from: owner }), "ERC721: caller is not token owner or approved");
       await mainNFT.burn(1, { from: users[0] });
     }); */
 

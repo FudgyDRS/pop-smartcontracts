@@ -35,7 +35,7 @@ const config = {
       accounts: [process.env.KEY_TESTNET],
     },
     sepoliaTestnet: {
-      url: "https://sepolia.infura.io/v3/52ee363135d344bc9fa2d78067487fc0",
+      url: process.env.INFURA_API,
       chainId: 11155111,
       accounts: [process.env.KEY_TESTNET],
     },
