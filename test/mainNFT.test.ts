@@ -65,11 +65,6 @@ contract("Main NFT", ([owner, operator, ...users]) => {
       /* Mint to owner*/
       await mainNFT.mint(owner, totalSupply);
       totalSupply = (await mainNFT.totalSupply({ from: owner })).toString();
-
-      console.log("parseUnits", parseUnits("3.14159", 7))
-      // result:
-      // parseUnits BigNumber { _hex: '0x01df5e5c', _isBigNumber: true }
-      // 0x01df5e5c === 31415900
     });
 
     it("Normal Mint", async () => {
@@ -77,14 +72,15 @@ contract("Main NFT", ([owner, operator, ...users]) => {
         .sendTransaction({ from: users[0] })
 
       let balance = (await mainNFT.balanceOf(users[0], { from: users[0] })).toString();
-      expect((await mainNFT.totalSupply({ from: owner })).toString()).to.equal(balance);
+      expect(2).to.equal(parseInt(balance));
     });
 
-    /* it("Burn", async () => {
+    it("Burn", async () => {
       await mainNFT.burn(1, { from: owner });
-      await expectRevert(mainNFT.burn(1, { from: owner }), "ERC721: caller is not token owner or approved");
-      await mainNFT.burn(1, { from: users[0] });
-    }); */
+      await expectRevert(mainNFT.burn(1, { from: owner }), "ERC721: invalid token ID");
+      await expectRevert(mainNFT.burn(0, { from: owner }), "ERC721: caller is not token owner or approved");
+      await mainNFT.burn(0, { from: users[0] });
+    });
 
     /* it("TransferFrom", async () => {
       let totalSupply = await mainNFT.totalSupply({ from: owner })
